@@ -196,6 +196,7 @@
             this.Controls.Add(this.tvCimpConfig);
             this.Controls.Add(this.chkDynamic);
             this.Controls.Add(this.btnPopulateProj);
+            this.Name = "Form1";
             this.Text = "Form1";
             this.Load += new System.EventHandler(this.Form1_Load);
             this.ResumeLayout(false);
