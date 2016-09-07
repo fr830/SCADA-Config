@@ -68,8 +68,8 @@
             // 
             // tvCimpConfig
             // 
-            this.tvCimpConfig.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
+            this.tvCimpConfig.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
+            | System.Windows.Forms.AnchorStyles.Left)
             | System.Windows.Forms.AnchorStyles.Right)));
             this.tvCimpConfig.Location = new System.Drawing.Point(357, 12);
             this.tvCimpConfig.Name = "tvCimpConfig";
@@ -116,8 +116,8 @@
             // 
             // tvPlantConfig
             // 
-            this.tvPlantConfig.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
+            this.tvPlantConfig.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
+            | System.Windows.Forms.AnchorStyles.Left)
             | System.Windows.Forms.AnchorStyles.Right)));
             this.tvPlantConfig.Location = new System.Drawing.Point(12, 12);
             this.tvPlantConfig.Name = "tvPlantConfig";
@@ -196,6 +196,7 @@
             this.Controls.Add(this.tvCimpConfig);
             this.Controls.Add(this.chkDynamic);
             this.Controls.Add(this.btnPopulateProj);
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name = "Form1";
             this.Text = "Form1";
             this.Load += new System.EventHandler(this.Form1_Load);

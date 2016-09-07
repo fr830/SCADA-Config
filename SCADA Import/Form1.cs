@@ -29,7 +29,7 @@ namespace JLR.SCADA.DCP
             plant = new Plant();
             plant.NewSeq += NewPlantSeq;
             plant.NewPlc += NewPlantPLC;
-            
+
             cimp = new CimpSeqs(sProject, sClass, Dynamic);
             cimp.NewSeq += NewCimpSeq;
             cimp.NewPlc += NewCimpPLC;
@@ -122,7 +122,7 @@ namespace JLR.SCADA.DCP
             {
                 case 0:
                     foreach (TreeNode t1 in t.Nodes)
-                        if(t1.BackColor.Equals(Color.DarkRed))
+                        if (t1.BackColor.Equals(Color.DarkRed))
                             cimp.ProjectAddSeq(plant.Plcs[t.Name].Sequnces[t1.Name]);
 
                     break;
@@ -327,7 +327,7 @@ namespace JLR.SCADA.DCP
 
                     if (t3.Nodes.Count == 0)
                         tvCimpConfig.Nodes.Remove(t3);
-            break;
+                    break;
             }
 
             Compare();
@@ -335,10 +335,10 @@ namespace JLR.SCADA.DCP
 
         private void btnAddAll_Click(object sender, EventArgs e)
         {
-            foreach(TreeNode t in tvPlantConfig.Nodes)
+            foreach (TreeNode t in tvPlantConfig.Nodes)
                 foreach (TreeNode t1 in t.Nodes)
-                        if (t1.BackColor.Equals(Color.DarkRed))
-                            cimp.ProjectAddSeq(plant.Plcs[t.Name].Sequnces[t1.Name]);
+                    if (t1.BackColor.Equals(Color.DarkRed))
+                        cimp.ProjectAddSeq(plant.Plcs[t.Name].Sequnces[t1.Name]);
 
             Compare();
         }
@@ -346,9 +346,9 @@ namespace JLR.SCADA.DCP
         private void btnDeleteAll_Click(object sender, EventArgs e)
         {
             List<TreeNode> toDel = new List<TreeNode>();
-            foreach(TreeNode t in tvCimpConfig.Nodes)
+            foreach (TreeNode t in tvCimpConfig.Nodes)
                 foreach (TreeNode t1 in t.Nodes)
-                        toDel.Add(t1);
+                    toDel.Add(t1);
 
 
             foreach (TreeNode t2 in toDel)
