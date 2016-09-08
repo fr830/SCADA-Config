@@ -19,13 +19,13 @@ namespace JLR.SCADA.DCP
 
         public Sequence(Plc p, int seqNum, int ms, string station)
         {
-            Key = p.Description + "." + seqNum.ToString("00");
+            Key = p.ObjRoot + "." + seqNum.ToString("00");
             SeqNum = seqNum;
             MS = ms;
             Station = station;
             Description = $"Seq:[{seqNum.ToString("00")}] MS:{ms.ToString("00")} - {station}";
             Plc = p;
-            string s = p.Description;
+            string s = p.ObjRoot;
             s = s.Replace("_", "");
             s = s.Replace(".", "");
             s = s.Replace("Slot", "S");

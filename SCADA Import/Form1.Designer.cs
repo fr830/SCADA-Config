@@ -28,11 +28,9 @@
         /// </summary>
         private void InitializeComponent()
         {
-            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
             this.btnPopulateProj = new System.Windows.Forms.Button();
             this.chkDynamic = new System.Windows.Forms.CheckBox();
             this.tvCimpConfig = new System.Windows.Forms.TreeView();
-            this.chkPLC = new System.Windows.Forms.CheckBox();
             this.chkSync = new System.Windows.Forms.CheckBox();
             this.btnGetPLCData = new System.Windows.Forms.Button();
             this.tvPlantConfig = new System.Windows.Forms.TreeView();
@@ -41,6 +39,7 @@
             this.btnDeleteSeq = new System.Windows.Forms.Button();
             this.btnAddAll = new System.Windows.Forms.Button();
             this.btnDeleteAll = new System.Windows.Forms.Button();
+            this.cboSource = new System.Windows.Forms.ComboBox();
             this.SuspendLayout();
             // 
             // btnPopulateProj
@@ -68,8 +67,8 @@
             // 
             // tvCimpConfig
             // 
-            this.tvCimpConfig.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
-            | System.Windows.Forms.AnchorStyles.Left)
+            this.tvCimpConfig.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.tvCimpConfig.Location = new System.Drawing.Point(357, 12);
             this.tvCimpConfig.Name = "tvCimpConfig";
@@ -78,18 +77,6 @@
             this.tvCimpConfig.AfterCollapse += new System.Windows.Forms.TreeViewEventHandler(this.tvCimpConfig_Select);
             this.tvCimpConfig.AfterExpand += new System.Windows.Forms.TreeViewEventHandler(this.tvCimpConfig_Select);
             this.tvCimpConfig.AfterSelect += new System.Windows.Forms.TreeViewEventHandler(this.tvCimpConfig_Select);
-            // 
-            // chkPLC
-            // 
-            this.chkPLC.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.chkPLC.AutoSize = true;
-            this.chkPLC.Location = new System.Drawing.Point(80, 567);
-            this.chkPLC.Name = "chkPLC";
-            this.chkPLC.Size = new System.Drawing.Size(72, 17);
-            this.chkPLC.TabIndex = 6;
-            this.chkPLC.Text = "PLC Data";
-            this.chkPLC.UseVisualStyleBackColor = true;
-            this.chkPLC.CheckedChanged += new System.EventHandler(this.chkPLC_CheckedChanged);
             // 
             // chkSync
             // 
@@ -116,8 +103,8 @@
             // 
             // tvPlantConfig
             // 
-            this.tvPlantConfig.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
-            | System.Windows.Forms.AnchorStyles.Left)
+            this.tvPlantConfig.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.tvPlantConfig.Location = new System.Drawing.Point(12, 12);
             this.tvPlantConfig.Name = "tvPlantConfig";
@@ -179,11 +166,24 @@
             this.btnDeleteAll.UseVisualStyleBackColor = true;
             this.btnDeleteAll.Click += new System.EventHandler(this.btnDeleteAll_Click);
             // 
+            // cboSource
+            // 
+            this.cboSource.FormattingEnabled = true;
+            this.cboSource.Items.AddRange(new object[] {
+            "File",
+            "Kepware",
+            "Matrikon"});
+            this.cboSource.Location = new System.Drawing.Point(31, 563);
+            this.cboSource.Name = "cboSource";
+            this.cboSource.Size = new System.Drawing.Size(121, 21);
+            this.cboSource.TabIndex = 15;
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(669, 598);
+            this.Controls.Add(this.cboSource);
             this.Controls.Add(this.btnDeleteAll);
             this.Controls.Add(this.btnAddAll);
             this.Controls.Add(this.btnDeleteSeq);
@@ -192,11 +192,9 @@
             this.Controls.Add(this.tvPlantConfig);
             this.Controls.Add(this.btnGetPLCData);
             this.Controls.Add(this.chkSync);
-            this.Controls.Add(this.chkPLC);
             this.Controls.Add(this.tvCimpConfig);
             this.Controls.Add(this.chkDynamic);
             this.Controls.Add(this.btnPopulateProj);
-            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name = "Form1";
             this.Text = "Form1";
             this.Load += new System.EventHandler(this.Form1_Load);
@@ -209,7 +207,6 @@
         private System.Windows.Forms.TreeView tvPlantConfig;
         private System.Windows.Forms.Button btnGetPLCData;
         private System.Windows.Forms.CheckBox chkSync;
-        private System.Windows.Forms.CheckBox chkPLC;
         private System.Windows.Forms.TreeView tvCimpConfig;
         private System.Windows.Forms.CheckBox chkDynamic;
         private System.Windows.Forms.Button btnPopulateProj;
@@ -218,6 +215,7 @@
         private System.Windows.Forms.Button btnDeleteSeq;
         private System.Windows.Forms.Button btnAddAll;
         private System.Windows.Forms.Button btnDeleteAll;
+        private System.Windows.Forms.ComboBox cboSource;
     }
 }
 

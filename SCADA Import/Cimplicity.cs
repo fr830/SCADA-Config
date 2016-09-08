@@ -68,8 +68,9 @@ namespace JLR.SCADA.DCP
                     int ms = int.Parse(o.Attributes["MS"].Value.Substring(3, 2));
                     int seq = int.Parse(o.Attributes["SEQ"].Value);
                     string desc = o.Attributes["$DESCRIPTION"].Value;
+                    string device = o.Attributes["$DEVICE_ID"].Value;
 
-                    Plc p = AddPLC(plc);
+                    Plc p = AddPLC(plc, device);
 
                     Sequence s = AddSequence(p, seq, ms, desc);
                     NewSeq?.Invoke(p, s);
@@ -78,7 +79,7 @@ namespace JLR.SCADA.DCP
             }
         }
 
-        public Plc AddPLC(string description)
+        public Plc AddPLC(string description, string device)
         {
             if (this.Plcs.ContainsKey(description))
             {
@@ -87,8 +88,8 @@ namespace JLR.SCADA.DCP
             else
             {
                 int i = Plcs.Count + 1;
-                Plc p = new Plc(i, description);
-                Plcs.Add(description, p);
+                Plc p = new Plc(i, description, device);
+                Plcs.Add(p.Tag, p);
                 NewPlc?.Invoke(p);
                 return p;
             }
@@ -110,7 +111,7 @@ namespace JLR.SCADA.DCP
 
             s.Plc.Sequnces.Remove(s.Key);
             if(s.Plc.Sequnces.Count == 0)
-                Plcs.Remove(s.Plc.Description);
+                Plcs.Remove(s.Plc.Tag);
 
             if (Dynamic)
             {
@@ -125,15 +126,15 @@ namespace JLR.SCADA.DCP
             oObj.ClassID = Class;
             if (Dynamic)
             {
-                Cimplicity.PointSet(@"IMPORT.PROGRESS", $"Start Seq: {s.ID} for: {s.Plc.Description}");
+                Cimplicity.PointSet(@"IMPORT.PROGRESS", $"Start Seq: {s.ID} for: {s.Plc.ObjRoot}");
             }
 
             oObj.ID = s.ID;
-            oObj.Attributes.Set("PLC", s.Plc.Description);
+            oObj.Attributes.Set("PLC", s.Plc.Tag);
             oObj.Attributes.Set("SEQ", s.SeqNum.ToString());
             oObj.Attributes.Set("$ALARM_CLASS", "HIGH");
             oObj.Attributes.Set("$DESCRIPTION", s.Station);
-            oObj.Attributes.Set("$DEVICE_ID", "OPC01");                
+            oObj.Attributes.Set("$DEVICE_ID", s.Plc.DEVICE_ID);                
             oObj.Attributes.Set("$RESOURCE_ID", "ZONE01");
             oObj.Attributes.Set("MS", "MS" + s.MS.ToString("000"));
 
@@ -149,12 +150,12 @@ namespace JLR.SCADA.DCP
 
             if (Dynamic)
             {
-                Cimplicity.PointSet(@"IMPORT.PROGRESS", $"End Seq: {s.ID} for: {s.Plc.Description}");
+                Cimplicity.PointSet(@"IMPORT.PROGRESS", $"End Seq: {s.ID} for: {s.Plc.ObjRoot}");
                 Cimplicity.PointSet(@"IMPORT.NEW_SEQ_NAME", s.ID);
             }
 
-            Plc p = AddPLC(s.Plc.Description);
-            Sequence s1 = AddSequence(this.Plcs[s.Plc.Description], s.SeqNum, s.MS, s.Station);
+            Plc p = AddPLC(s.Plc.Tag, s.Plc.DEVICE_ID);
+            Sequence s1 = AddSequence(this.Plcs[s.Plc.Tag], s.SeqNum, s.MS, s.Station);
             NewSeq?.Invoke(s1.Plc, s);
 
 

@@ -15,7 +15,6 @@ namespace JLR.SCADA.DCP
     public partial class Form1 : Form
     {
         bool Dynamic = false;
-        bool FromPLC = false;
         bool SyncData = false;
         string sProject = "D:\\Projects\\SCADA_TEST\\SCADA_TEST.gef";
         string sClass = "SCADA_SEQ";
@@ -35,13 +34,19 @@ namespace JLR.SCADA.DCP
             cimp.NewPlc += NewCimpPLC;
 
             chkDynamic.Checked = Dynamic;
-            chkPLC.Checked = FromPLC;
+        }
+
+        public void NewPlantPLC(Plc p)
+        {
+
+            tvPlantConfig.Nodes.Add(p.Tag, p.ObjRoot).ForeColor = Color.DarkRed;
+            tvPlantConfig.Refresh();
         }
 
         public void NewPlantSeq(Plc p, Sequence s)
         {
 
-            TreeNode[] t1 = tvPlantConfig.Nodes.Find(p.Description, true);
+            TreeNode[] t1 = tvPlantConfig.Nodes.Find(p.Tag, true);
 
             if (t1.Length == 1)
             {
@@ -51,35 +56,30 @@ namespace JLR.SCADA.DCP
             }
             tvPlantConfig.Refresh();
         }
-
-        public void NewCimpSeq(Plc p, Sequence s)
-        {
-            TreeNode[] t1 = tvCimpConfig.Nodes.Find(p.Description, true);
-            TreeNode t2;
-
-            if (t1.Length == 1)
-                t2 = t1[0];
-            else
-                t2 = tvCimpConfig.Nodes.Add(p.Description, p.Description);
-
-            t2.Nodes.Add(s.Key, s.Description);
-            t2.ForeColor = Color.Black;
-            tvPlantConfig.Refresh();
-            tvCimpConfig.Refresh();
-        }
-
-        public void NewPlantPLC(Plc p)
-        {
-
-            tvPlantConfig.Nodes.Add(p.Description, p.Description).ForeColor = Color.DarkRed;
-            tvPlantConfig.Refresh();
-        }
-
+        
         public void NewCimpPLC(Plc p)
         {
 
-            tvCimpConfig.Nodes.Add(p.Description, p.Description).ForeColor = Color.DarkRed;
+            tvCimpConfig.Nodes.Add(p.Tag, p.ObjRoot).ForeColor = Color.DarkRed;
             tvCimpConfig.Refresh();
+        }
+
+        public void NewCimpSeq(Plc p, Sequence s)
+        {
+            TreeNode[] t1 = tvCimpConfig.Nodes.Find(p.Tag, true);
+            TreeNode t2;
+
+            if (t1.Length == 1)
+            {
+                t2 = t1[0];
+                //else
+                //  t2 = tvCimpConfig.Nodes.Add(p.Tag, p.Description);
+
+                t2.Nodes.Add(s.Key, s.Description);
+                t2.ForeColor = Color.Black;
+                tvPlantConfig.Refresh();
+                tvCimpConfig.Refresh();
+            }
         }
 
         private void chkDynamic_CheckedChanged(object sender, EventArgs e)
@@ -88,20 +88,23 @@ namespace JLR.SCADA.DCP
             cimp.Dynamic = Dynamic;
         }
 
-        private void chkPLC_CheckedChanged(object sender, EventArgs e)
-        {
-            FromPLC = chkPLC.Checked;
-        }
-
         private void btnGetPLCData_Click(object sender, EventArgs e)
         {
             tvPlantConfig.Nodes.Clear();
-            if (FromPLC)
-                plant.GetOPCTags("Kepware.KEPServerEX.V5", SyncData);
+            switch(cboSource.Text)
+            {
+                case "Kepware":
+                    plant.GetOPCTags(Plant.OPCType.Kepware, SyncData);
+                    break;
 
-            else
-                plant.GetTestData();
+                case "Matrikon":
+                    plant.GetOPCTags(Plant.OPCType.Matrikon, SyncData);
+                    break;
 
+                case "File":
+                    plant.GetTestData();
+                    break;
+            }
         }
 
         private void chkSync_CheckedChanged(object sender, EventArgs e)
@@ -366,9 +369,6 @@ namespace JLR.SCADA.DCP
 
             }
 
-
-
-
             Compare();
 
         }
@@ -393,5 +393,6 @@ namespace JLR.SCADA.DCP
             toolTip1.SetToolTip(this.btnDeleteSeq, "Delete Selected Object");
 
         }
+
     }
 }

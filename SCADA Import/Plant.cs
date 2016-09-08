@@ -12,6 +12,7 @@ namespace JLR.SCADA.DCP
 {
     public class Plant
     {
+        public enum OPCType {Kepware, Matrikon}
         public bool Sync { get; set; }
         public delegate void SeqHandler(Plc p, Sequence s);
         public event SeqHandler NewSeq;
@@ -21,10 +22,11 @@ namespace JLR.SCADA.DCP
         public Dictionary<string, Plc> Plcs = new Dictionary<string, Plc>();
 
 
-        OPCServer oServer = new OPCServer();
-        OPCGroup oGroup;
-        OPCBrowser oBrowser;
-        string sGroup = "KJR";
+        private OPCServer oServer = new OPCServer();
+        private OPCGroup oGroup;
+        private OPCBrowser oBrowser;
+        private string sGroup = "SCADA";
+        private OPCType type;
 
         private void OCPCallBack(int TransactionID, int NumItems, ref Array ClientHandles, ref Array Values, ref Array Qualities, ref Array TimeStamps, ref Array Errors)
         {
@@ -52,11 +54,37 @@ namespace JLR.SCADA.DCP
 
         public Plant() { }
 
-        public void GetOPCTags(string server, bool SyncData)
+        public void GetOPCTags(OPCType opc, bool SyncData)
         {
+            string server = "";
+            string filter1 = "";
+            string filter2 = "";
+            string sep = "";
+            string device = "";
+            type = opc;
+
+            switch (type)
+            {
+                case OPCType.Kepware:
+                    server = "Kepware.KEPServerEX.V5";
+                    filter1 = "A3*";
+                    filter2 = "R*";
+                    sep = ".";
+                    device = "KEPWARE";
+                    break;
+                case OPCType.Matrikon:
+                    server = "Matrikon.OPC.AllenBradleyPLCs.1";
+                    filter1 = "A3*";
+                    filter2 = "";
+                    sep = ":";
+                    device = "MATRIKON";
+                    break;
+            }
+
             Plcs.Clear();
             this.Sync = SyncData;
             List<string> sChannels = new List<string>();
+
 
             oServer.Connect(server);
             oServer.OPCGroups.DefaultGroupIsActive = true;
@@ -68,7 +96,7 @@ namespace JLR.SCADA.DCP
             oGroup.AsyncReadComplete += OCPCallBack;
 
             oBrowser = oServer.CreateBrowser();
-            oBrowser.Filter = "A3*";
+            oBrowser.Filter = filter1;
             oBrowser.ShowBranches();
 
             iChannels = oBrowser.Count;
@@ -79,11 +107,11 @@ namespace JLR.SCADA.DCP
             foreach (string sChannel in sChannels)
             {
                 oBrowser.MoveDown(sChannel);
-                oBrowser.Filter = "R*";
+                oBrowser.Filter = filter2;
                 oBrowser.ShowBranches();
 
                 for (int j = 0; j < oBrowser.Count; j++)
-                    this.AddPLC(sChannel + "." + oBrowser.Item(j + 1));
+                    this.AddPLC(sChannel + sep + oBrowser.Item(j + 1), device);
 
                 oBrowser.MoveUp();
             }
@@ -124,18 +152,18 @@ namespace JLR.SCADA.DCP
         {
    
             int i = Plcs.Count + 1;
-            Plc p = new Plc(i,description);
+            Plc p = new Plc(i,description,"KEPWARE");
 
             Plcs.Add(description, p);
             NewPlc?.Invoke(p);
             return p;
         }
 
-        public Plc AddPLC(string description)
+        public Plc AddPLC(string description, string device)
         {
             int i = Plcs.Count + 1;
-            Plc p = new Plc(i, description);
-            Plcs.Add(description, p);
+            Plc p = new Plc(i, description, device);
+            Plcs.Add(p.Tag, p);
             NewPlc?.Invoke(p);
             GetSeqences(p);
             return p;
@@ -151,20 +179,39 @@ namespace JLR.SCADA.DCP
             Array Values;
             object qual = new object();
             object TS = new object();
+            string tag = "";
 
-            for (int i = 1; i <= 30; i++)
-            {
-                ItemIDs.SetValue($"{plc.Description}.ZZMISSEQ[{(i).ToString()}].SEQ", i);
-                ItemIDs.SetValue($"{plc.Description}.ZZMISSEQ[{(i).ToString()}].DESC.DATA/32", i + 30);
-                ClntHndl.SetValue(i, i);
-                ClntHndl.SetValue(i + 30, i + 30);
-            }
             try
             {
-                oGroup.OPCItems.AddItems((int)60, ref ItemIDs, ref ClntHndl, out SvrHndl, out SvrErr);
+                for (int i = 1; i <= 30; i++)
+                {
+                    switch (type)
+                    {
+                        case OPCType.Kepware:
+
+                            tag = $"{plc.Tag}.ZZMISSEQ[{(i).ToString()}].SEQ";
+                            ItemIDs.SetValue(tag, i);
+                            tag = $"{plc.Tag}.ZZMISSEQ[{(i).ToString()}].DESC.DATA/8";
+                            ItemIDs.SetValue(tag, i + 30);
+                            break;
+
+                        case OPCType.Matrikon:
+                            tag = $"{plc.Tag}:PLC:SCADA_CONFIG:ZZMISSEQ[{(i).ToString()}].SEQ.VALUE";
+                            ItemIDs.SetValue(tag, i);
+                            //"A3_01_R01_S01: PLC: SCADA_CONFIG: ZZMISSEQ[1].DESC.VALUE"
+                            tag = $"{plc.Tag}:PLC:SCADA_CONFIG:ZZMISSEQ[{(i).ToString()}].DESC.VALUE";
+                            ItemIDs.SetValue(tag, i + 30);
+                            break;
+                    }
+
+                    ClntHndl.SetValue(i, i);
+                    ClntHndl.SetValue(i + 30, i + 30);
+                }
+
+                oGroup.OPCItems.AddItems(60, ref ItemIDs, ref ClntHndl, out SvrHndl, out SvrErr);
                 if (this.Sync)
                 {
-                    oGroup.SyncRead((short)OPCAutomation.OPCDataSource.OPCDevice, (int)60, ref SvrHndl, out Values, out SvrErr, out qual, out TS);
+                    oGroup.SyncRead((short)OPCAutomation.OPCDataSource.OPCDevice, 60, ref SvrHndl, out Values, out SvrErr, out qual, out TS);
 
                     for (int j = 1; j <= 30; j++)
                     {
@@ -180,13 +227,12 @@ namespace JLR.SCADA.DCP
                     oGroup.OPCItems.Remove(60, ref SvrHndl, out SvrErr);
                 }
                 else
-                                {
+                {
                     int ic;
                     oGroup.AsyncRead(60, ref SvrHndl, out SvrErr, plc.ID, out ic);
                 }
-
             }
-            catch (Exception ex) { MessageBox.Show(ex.ToString()); }
+            catch (Exception ex) { MessageBox.Show(ex.ToString());}
 
         }
     }

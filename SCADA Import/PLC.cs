@@ -10,13 +10,23 @@ namespace JLR.SCADA.DCP
     {
         public Dictionary<string, Sequence> Sequnces = new Dictionary<string, Sequence>();
 
-        public string Description { get; set; }
+        public string Tag { get; set; }
+        public string DEVICE_ID { get; set; }
+        public string ObjRoot { get; set; }
         public int ID { get; set; }
 
-        public Plc(int id, string description)
+
+        public Plc(int id, string tag, string device)
         {
             ID = id;
-            Description = description;
+            Tag = tag.Replace(":PLC", "");
+
+            string t = tag;
+            t = t.Replace("_", "");
+            t = t.Replace(".", "");
+            t = t.Replace(":PLC", "");
+            ObjRoot = t;
+            DEVICE_ID = device;
         }
 
 
@@ -24,6 +34,7 @@ namespace JLR.SCADA.DCP
         {
             Sequence s = new Sequence(this, seqNum, ms, description);
             Sequnces.Add(s.Key, s);
+
             return s;
 
         }
