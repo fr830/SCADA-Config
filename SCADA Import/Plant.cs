@@ -19,7 +19,7 @@ namespace JLR.SCADA.DCP
         public delegate void PlcHandler(Plc p);
         public event PlcHandler NewPlc;
 
-        public Dictionary<string, Plc> Plcs = new Dictionary<string, Plc>();
+        public readonly Dictionary<string, Plc> Plcs = new Dictionary<string, Plc>();
 
 
         private OPCServer oServer = new OPCServer();
@@ -123,7 +123,6 @@ namespace JLR.SCADA.DCP
 
             string filePath = @"TestPlcs.csv";
             StreamReader sr = new StreamReader(filePath);
-            //var lines = new List<string[]>();
             sr.ReadLine().Split(',');
 
             while (!sr.EndOfStream)
@@ -150,7 +149,6 @@ namespace JLR.SCADA.DCP
         
         private Plc _AddPLC(string description)
         {
-   
             int i = Plcs.Count + 1;
             Plc p = new Plc(i,description,"KEPWARE");
 

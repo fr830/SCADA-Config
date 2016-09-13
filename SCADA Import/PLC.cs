@@ -8,7 +8,7 @@ namespace JLR.SCADA.DCP
 {
     public class Plc
     {
-        public Dictionary<string, Sequence> Sequnces = new Dictionary<string, Sequence>();
+        public readonly Dictionary<string, Sequence> Sequnces = new Dictionary<string, Sequence>();
 
         public string Tag { get; set; }
         public string DEVICE_ID { get; set; }
@@ -29,12 +29,14 @@ namespace JLR.SCADA.DCP
             DEVICE_ID = device;
         }
 
-
+        public void AddSequence(Sequence s)
+        {
+            Sequnces.Add(s.Key, s);
+        }
         public Sequence AddSequence(int seqNum, int ms, string description)
         {
             Sequence s = new Sequence(this, seqNum, ms, description);
-            Sequnces.Add(s.Key, s);
-
+            AddSequence(s);
             return s;
 
         }
