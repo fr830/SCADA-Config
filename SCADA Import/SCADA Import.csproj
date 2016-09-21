@@ -97,6 +97,7 @@
     <Compile Include="Form1.Designer.cs">
       <DependentUpon>Form1.cs</DependentUpon>
     </Compile>
+    <Compile Include="MachineSection.cs" />
     <Compile Include="Plant.cs" />
     <Compile Include="PLC.cs" />
     <Compile Include="Program.cs" />

@@ -15,7 +15,6 @@ namespace JLR.SCADA.DCP
         public string ObjRoot { get; set; }
         public int ID { get; set; }
 
-
         public Plc(int id, string tag, string device)
         {
             ID = id;
@@ -33,9 +32,10 @@ namespace JLR.SCADA.DCP
         {
             Sequnces.Add(s.Key, s);
         }
-        public Sequence AddSequence(int seqNum, int ms, string description)
+
+        public Sequence AddSequence(int seqNum, string zone, int ms, string description)
         {
-            Sequence s = new Sequence(this, seqNum, ms, description);
+            Sequence s = new Sequence(this, seqNum, zone, ms, description);
             AddSequence(s);
             return s;
 

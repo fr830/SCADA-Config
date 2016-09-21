@@ -11,7 +11,6 @@ using Proficy.CIMPLICITY.CimServer;
 
 namespace JLR.SCADA.DCP
 {
-    // public enum Days { Plc, Test}; 
     public class CimpSeqs
     {
         public delegate void SeqHandler(Plc p, Sequence s);
@@ -20,6 +19,7 @@ namespace JLR.SCADA.DCP
         public event PlcHandler NewPlc;
 
         public Dictionary<string, Plc> Plcs = new Dictionary<string, Plc>();
+        public Dictionary<string, MachineSection> MachineSections = new Dictionary<string, MachineSection>();
 
         public string Project { get; set; }
         public string Class { get; set; }
@@ -69,15 +69,27 @@ namespace JLR.SCADA.DCP
                     int seq = int.Parse(o.Attributes["SEQ"].Value);
                     string desc = o.Attributes["$DESCRIPTION"].Value;
                     string device = o.Attributes["$DEVICE_ID"].Value;
+                    string zone = o.Attributes["$RESOURCE_ID"].Value;
 
                     Plc p = AddPLC(plc, device);
 
-                    Sequence s = AddSequence(p, seq, ms, desc);
+                    Sequence s = AddSequence(p, seq, zone, ms, desc);
                     NewSeq?.Invoke(p, s);
 
                 }
             }
         }
+
+        public void GetMachineSections()
+        {
+            foreach (CimAlarmClass c in oProject.AlarmClasses)
+                if (c.ClassID.Substring(0, 2).Equals("MS"))
+                {
+                    MachineSection ms = new MachineSection(c.ClassID, c.Title);
+                    MachineSections.Add(c.Title, ms);
+                }
+        }
+
 
         public Plc AddPLC(string description, string device)
         {
@@ -95,9 +107,9 @@ namespace JLR.SCADA.DCP
             }
         }
 
-        private Sequence AddSequence(Plc p, int seqNum, int ms, string description)
+        private Sequence AddSequence(Plc p, int seqNum, string zone, int ms, string description)
         {
-            Sequence s = new Sequence(p, seqNum, ms, description);
+            Sequence s = new Sequence(p, seqNum, zone, ms, description);
             p.Sequnces.Add(s.Key, s);
             return s;
 
@@ -115,7 +127,7 @@ namespace JLR.SCADA.DCP
 
             if (Dynamic)
             {
-                Cimplicity.PointSet(@"IMPORT.NEW_SEQ_NAME", s.ID);
+                Cimplicity.PointSet(@"IMPORT.NEW_SEQ_NAME", "Del: " + s.ID);
             }
         }
 
@@ -132,11 +144,13 @@ namespace JLR.SCADA.DCP
             oObj.ID = s.ID;
             oObj.Attributes.Set("PLC", s.Plc.Tag);
             oObj.Attributes.Set("SEQ", s.SeqNum.ToString());
-            oObj.Attributes.Set("$ALARM_CLASS", "HIGH");
+            oObj.Attributes.Set("$ALARM_CLASS", this.MachineSections[s.ALARM_CLASS].ALARM_CLASS);
             oObj.Attributes.Set("$DESCRIPTION", s.Station);
             oObj.Attributes.Set("$DEVICE_ID", s.Plc.DEVICE_ID);                
             oObj.Attributes.Set("$RESOURCE_ID", "ZONE01");
             oObj.Attributes.Set("MS", "MS" + s.MS.ToString("000"));
+
+            oObj.Routing.AddAll();
 
             oProject.Objects.Save(oObj, Dynamic);
 
@@ -155,7 +169,7 @@ namespace JLR.SCADA.DCP
             }
 
             Plc p = AddPLC(s.Plc.Tag, s.Plc.DEVICE_ID);
-            Sequence s1 = AddSequence(this.Plcs[s.Plc.Tag], s.SeqNum, s.MS, s.Station);
+            Sequence s1 = AddSequence(this.Plcs[s.Plc.Tag], s.SeqNum, "ZONE01", s.MS, s.Station);
             NewSeq?.Invoke(s1.Plc, s);
 
 

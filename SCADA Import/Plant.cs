@@ -32,6 +32,8 @@ namespace JLR.SCADA.DCP
         {
             Plc p = Plcs.ElementAt(TransactionID - 1).Value;
             string[] v = new string[61];
+            string zone = "ZONE01";
+            if (TransactionID % 2 == 0) zone = "ZONE02";
 
             for (int i = 1; i <= 60; i++)
             {
@@ -45,7 +47,7 @@ namespace JLR.SCADA.DCP
                 string desc = v[i + 30];
                 if (ms > 0)
                 {
-                    Sequence s = p.AddSequence(i, ms, desc);
+                    Sequence s = p.AddSequence(i, zone, ms, desc);
                     NewSeq?.Invoke(p, s);
 
                 }
@@ -140,7 +142,7 @@ namespace JLR.SCADA.DCP
                 int ms = int.Parse(Line[2]);
                 if (ms > 0)
                 {
-                    Sequence s = p.AddSequence(int.Parse(Line[1]), ms, Line[3]);
+                    Sequence s = p.AddSequence(int.Parse(Line[1]), Line[4], ms, Line[3]);
                     NewSeq?.Invoke(p, s);
                 }
             }
@@ -211,13 +213,16 @@ namespace JLR.SCADA.DCP
                 {
                     oGroup.SyncRead((short)OPCAutomation.OPCDataSource.OPCDevice, 60, ref SvrHndl, out Values, out SvrErr, out qual, out TS);
 
+                    string zone = "ZONE01";
+                    if (plc.ID % 2 == 0) zone = "ZONE02";
+
                     for (int j = 1; j <= 30; j++)
                     {
                         int ms = int.Parse(Values.GetValue(j).ToString());
                         string desc = Values.GetValue(j + 30).ToString();
                         if (ms > 0)
                         {
-                            Sequence s = plc.AddSequence(j, ms, desc);
+                            Sequence s = plc.AddSequence(j, zone, ms, desc);
                             NewSeq?.Invoke(plc, s);
                         }
                     }

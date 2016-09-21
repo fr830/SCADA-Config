@@ -115,6 +115,7 @@ namespace JLR.SCADA.DCP
         private void btnPopulateProj_Click(object sender, EventArgs e)
         {
             tvCimpConfig.Nodes.Clear();
+            cimp.GetMachineSections();
             cimp.GetSeqences();
         }
 
@@ -251,7 +252,7 @@ namespace JLR.SCADA.DCP
                     {
                         case 0:
                         case 1:
-                            btnDeleteSeq.Enabled = e.Node.BackColor.Equals(Color.DarkRed);
+                            btnDeleteSeq.Enabled = true;// e.Node.BackColor.Equals(Color.DarkRed);
                             break;
 
 
