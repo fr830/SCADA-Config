@@ -17,6 +17,8 @@ namespace JLR.SCADA.DCP
         public event SeqHandler NewSeq;
         public delegate void PlcHandler(Plc p);
         public event PlcHandler NewPlc;
+        public delegate void MSHandler(MachineSection m);
+        public event MSHandler NewMS;
 
         public Dictionary<string, Plc> Plcs = new Dictionary<string, Plc>();
         public Dictionary<string, MachineSection> MachineSections = new Dictionary<string, MachineSection>();
@@ -65,7 +67,7 @@ namespace JLR.SCADA.DCP
                 if (o.ClassID == Class)
                 {
                     string plc = o.Attributes["PLC"].Value;
-                    int ms = int.Parse(o.Attributes["MS"].Value.Substring(3, 2));
+                    int ms = int.Parse(o.Attributes["MS"].Value.Substring(2, 2));
                     int seq = int.Parse(o.Attributes["SEQ"].Value);
                     string desc = o.Attributes["$DESCRIPTION"].Value;
                     string device = o.Attributes["$DEVICE_ID"].Value;
@@ -82,11 +84,13 @@ namespace JLR.SCADA.DCP
 
         public void GetMachineSections()
         {
-            foreach (CimAlarmClass c in oProject.AlarmClasses)
-                if (c.ClassID.Substring(0, 2).Equals("MS"))
+            MachineSections.Clear();
+            foreach (CimObjectInstance c in oProject.Objects)
+                if (c.ClassID.Equals("SCADA_MS"))
                 {
-                    MachineSection ms = new MachineSection(c.ClassID, c.Title);
-                    MachineSections.Add(c.Title, ms);
+                    MachineSection ms = new MachineSection(c.ID, c.Description);
+                    MachineSections.Add(c.ID, ms);
+                    NewMS?.Invoke(ms);
                 }
         }
 
@@ -134,6 +138,10 @@ namespace JLR.SCADA.DCP
         public void ProjectAddSeq(Sequence s)
         {
             oProject.dynamicMode = Dynamic;
+
+            if (oProject.Objects[s.ID] != null)
+                Plcs[s.Plc.Tag].Sequnces.Remove(s.Key) ;
+
             CimObjectInstance oObj = new CimObjectInstance();
             oObj.ClassID = Class;
             if (Dynamic)
@@ -142,13 +150,12 @@ namespace JLR.SCADA.DCP
             }
 
             oObj.ID = s.ID;
+            oObj.Attributes.Set("$DESCRIPTION", s.Station);
+            oObj.Attributes.Set("$DEVICE_ID", s.Plc.DEVICE_ID);
+            oObj.Attributes.Set("$RESOURCE_ID", "ZONE01");
+            oObj.Attributes.Set("MS", this.MachineSections[s.ALARM_CLASS].MS);
             oObj.Attributes.Set("PLC", s.Plc.Tag);
             oObj.Attributes.Set("SEQ", s.SeqNum.ToString());
-            oObj.Attributes.Set("$ALARM_CLASS", this.MachineSections[s.ALARM_CLASS].ALARM_CLASS);
-            oObj.Attributes.Set("$DESCRIPTION", s.Station);
-            oObj.Attributes.Set("$DEVICE_ID", s.Plc.DEVICE_ID);                
-            oObj.Attributes.Set("$RESOURCE_ID", "ZONE01");
-            oObj.Attributes.Set("MS", "MS" + s.MS.ToString("000"));
 
             oObj.Routing.AddAll();
 
@@ -173,6 +180,80 @@ namespace JLR.SCADA.DCP
             NewSeq?.Invoke(s1.Plc, s);
 
 
+        }
+
+        public void ProjectAddAlmCls(int i, string zone, string ms)
+        {
+            CimAlarmClass c;
+
+            c = oProject.AlarmClasses.Add($"MS{i.ToString("00")}A");
+            c.Title = $"Auto {zone}  {ms}";
+            c.AlarmHiHiBGColor = CimAlarmClassColorEnum.cimColorIndx_15_Yellow;
+            c.AlarmHiHiFGColor = CimAlarmClassColorEnum.cimColorIndx_0_Black;
+            c.Save();
+
+            c = oProject.AlarmClasses.Add($"MS{i.ToString("00")}S");
+            c.Title = $"Starved {zone}  {ms}";
+            c.AlarmHiHiBGColor = CimAlarmClassColorEnum.cimColorIndx_15_Yellow;
+            c.AlarmHiHiFGColor = CimAlarmClassColorEnum.cimColorIndx_0_Black;
+            c.Save();
+
+            c = oProject.AlarmClasses.Add($"MS{i.ToString("00")}B");
+            c.Title = $"Blocked {zone}  {ms}";
+            c.AlarmHiHiBGColor = CimAlarmClassColorEnum.cimColorIndx_15_Yellow;
+            c.AlarmHiHiFGColor = CimAlarmClassColorEnum.cimColorIndx_0_Black;
+            c.Save();
+
+            c = oProject.AlarmClasses.Add($"MS{i.ToString("00")}P");
+            c.Title = $"P Hold {zone}  {ms}";
+            c.AlarmHiHiBGColor = CimAlarmClassColorEnum.cimColorIndx_15_Yellow;
+            c.AlarmHiHiFGColor = CimAlarmClassColorEnum.cimColorIndx_0_Black;
+            c.Save();
+
+            c = oProject.AlarmClasses.Add($"MS{i.ToString("00")}W");
+            c.Title = $"Waiting Attention {zone}  {ms}";
+            c.AlarmHiHiBGColor = CimAlarmClassColorEnum.cimColorIndx_1_Red;
+            c.AlarmHiHiFGColor = CimAlarmClassColorEnum.cimColorIndx_0_Black;
+            c.Save();
+
+            c = oProject.AlarmClasses.Add($"MS{i.ToString("00")}R");
+            c.Title = $"Repair in Progress {zone}  {ms}";
+            c.AlarmHiHiBGColor = CimAlarmClassColorEnum.cimColorIndx_4_Maroon;
+            c.AlarmHiHiFGColor = CimAlarmClassColorEnum.cimColorIndx_0_Black;
+            c.Save();
+
+            c = oProject.AlarmClasses.Add($"MS{i.ToString("00")}M");
+            c.Title = $"Shutdown {zone}  {ms}";
+            c.AlarmHiHiBGColor = CimAlarmClassColorEnum.cimColorIndx_3_Blue;
+            c.AlarmHiHiFGColor = CimAlarmClassColorEnum.cimColorIndx_0_Black;
+            c.Save();
+
+            c = oProject.AlarmClasses.Add($"MS{i.ToString("00")}E");
+            c.Title = $"E-Stop {zone}  {ms}";
+            c.AlarmHiHiBGColor = CimAlarmClassColorEnum.cimColorIndx_1_Red;
+            c.AlarmHiHiFGColor = CimAlarmClassColorEnum.cimColorIndx_0_Black;
+            c.Save();
+            
+            CimObjectInstance oObj = new CimObjectInstance();
+            oObj.ClassID = "SCADA_MS";
+
+            oObj.ID = zone + "_" + ms;
+            oObj.Attributes.Set("$RESOURCE_ID", zone);
+            oObj.Attributes.Set("$DESCRIPTION", zone + " " + ms);
+            oObj.Attributes.Set("MS", ms);
+
+            oObj.Routing.AddAll();
+
+            oProject.Objects.Save(oObj, Dynamic);
+
+        }
+
+        public void ProjectAddResource(string zone)
+        {
+            cimResource r;
+            r = oProject.Resources.New(zone);
+            r.Users.AddAll();
+            oProject.Resources.Save(r, 0);
         }
 
     }

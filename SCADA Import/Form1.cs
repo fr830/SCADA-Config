@@ -32,7 +32,8 @@ namespace JLR.SCADA.DCP
             cimp = new CimpSeqs(sProject, sClass, Dynamic);
             cimp.NewSeq += NewCimpSeq;
             cimp.NewPlc += NewCimpPLC;
-
+            cimp.NewMS += NewCimpMS;
+            
             chkDynamic.Checked = Dynamic;
         }
 
@@ -57,6 +58,15 @@ namespace JLR.SCADA.DCP
             tvPlantConfig.Refresh();
         }
         
+        public void NewCimpMS(MachineSection ms)
+        {
+            if (tvMS.Nodes.Find(ms.Zone, true).Count() == 0)
+                tvMS.Nodes.Add(ms.Zone, ms.Zone);
+
+            tvMS.Nodes[ms.Zone].Nodes.Add(ms.ALARM_CLASS, ms.MS);
+            //tvMS.Nodes.Add(ms.MS, ms.Description);
+            tvMS.Refresh();
+        }
         public void NewCimpPLC(Plc p)
         {
 
@@ -115,6 +125,7 @@ namespace JLR.SCADA.DCP
         private void btnPopulateProj_Click(object sender, EventArgs e)
         {
             tvCimpConfig.Nodes.Clear();
+            tvMS.Nodes.Clear();
             cimp.GetMachineSections();
             cimp.GetSeqences();
         }
@@ -127,11 +138,18 @@ namespace JLR.SCADA.DCP
                 case 0:
                     foreach (TreeNode t1 in t.Nodes)
                         if (t1.BackColor.Equals(Color.DarkRed))
-                            cimp.ProjectAddSeq(plant.Plcs[t.Name].Sequnces[t1.Name]);
+                        {
+                            if (tvCimpConfig.Nodes.Find(t1.Name, true).Count() == 1)
+                                tvCimpConfig.Nodes.Remove(tvCimpConfig.Nodes.Find(t1.Name, true)[0]);
 
+                            cimp.ProjectAddSeq(plant.Plcs[t.Name].Sequnces[t1.Name]);
+                        }
                     break;
 
                 case 1:
+                    if (tvCimpConfig.Nodes.Find(t.Name, true).Count() == 1)
+                        tvCimpConfig.Nodes.Remove(tvCimpConfig.Nodes.Find(t.Name, true)[0]);
+
                     cimp.ProjectAddSeq(plant.Plcs[t.Parent.Name].Sequnces[t.Name]);
                     break;
             }
@@ -172,15 +190,16 @@ namespace JLR.SCADA.DCP
                 {
                     foreach (KeyValuePair<string, Sequence> s1 in p1.Value.Sequnces)
                         if (cimp.Plcs[p1.Key].Sequnces.ContainsKey(s1.Key))
-                        {
-                            tvCimpConfig.Nodes.Find(s1.Key, true)[0].BackColor = Color.Transparent;
-                            tvCimpConfig.Nodes.Find(s1.Key, true)[0].ForeColor = Color.Black;
-                        }
-                        else
-                        {
-                            tvPlantConfig.Nodes.Find(p1.Key, true)[0].BackColor = Color.DarkRed;
-                            tvPlantConfig.Nodes.Find(p1.Key, true)[0].ForeColor = Color.White;
-                        }
+                            if(cimp.Plcs[p1.Key].Sequnces[s1.Key].MS == plant.Plcs[p1.Key].Sequnces[s1.Key].MS)
+                                {
+                                    tvCimpConfig.Nodes.Find(s1.Key, true)[0].BackColor = Color.Transparent;
+                                    tvCimpConfig.Nodes.Find(s1.Key, true)[0].ForeColor = Color.Black;
+                                }
+                                else
+                                {
+                                    tvPlantConfig.Nodes.Find(p1.Key, true)[0].BackColor = Color.DarkRed;
+                                    tvPlantConfig.Nodes.Find(p1.Key, true)[0].ForeColor = Color.White;
+                                }
                 }
                 else
                 {
@@ -201,15 +220,16 @@ namespace JLR.SCADA.DCP
                 {
                     foreach (KeyValuePair<string, Sequence> s1 in p1.Value.Sequnces)
                         if (plant.Plcs[p1.Key].Sequnces.ContainsKey(s1.Key))
-                        {
-                            tvPlantConfig.Nodes.Find(s1.Key, true)[0].BackColor = Color.Transparent;
-                            tvPlantConfig.Nodes.Find(s1.Key, true)[0].ForeColor = Color.Black;
-                        }
-                        else
-                        {
-                            tvPlantConfig.Nodes.Find(p1.Key, true)[0].BackColor = Color.DarkRed;
-                            tvPlantConfig.Nodes.Find(p1.Key, true)[0].ForeColor = Color.White;
-                        }
+                            if (plant.Plcs[p1.Key].Sequnces[s1.Key].MS == cimp.Plcs[p1.Key].Sequnces[s1.Key].MS)
+                            {
+                                tvPlantConfig.Nodes.Find(s1.Key, true)[0].BackColor = Color.Transparent;
+                                tvPlantConfig.Nodes.Find(s1.Key, true)[0].ForeColor = Color.Black;
+                            }
+                            else
+                            {
+                                tvPlantConfig.Nodes.Find(p1.Key, true)[0].BackColor = Color.DarkRed;
+                                tvPlantConfig.Nodes.Find(p1.Key, true)[0].ForeColor = Color.White;
+                            }
 
                 }
                 else
@@ -342,7 +362,11 @@ namespace JLR.SCADA.DCP
             foreach (TreeNode t in tvPlantConfig.Nodes)
                 foreach (TreeNode t1 in t.Nodes)
                     if (t1.BackColor.Equals(Color.DarkRed))
+                    {
+                        if (tvCimpConfig.Nodes.Find(t1.Name, true).Count() == 1)
+                            tvCimpConfig.Nodes.Remove(tvCimpConfig.Nodes.Find(t1.Name, true)[0]);
                         cimp.ProjectAddSeq(plant.Plcs[t.Name].Sequnces[t1.Name]);
+                    }
 
             Compare();
         }
@@ -395,5 +419,34 @@ namespace JLR.SCADA.DCP
 
         }
 
+        private void btnClass_Click(object sender, EventArgs e)
+        {
+            int i = 0;
+            for (int z = 1; z <= (int)numZones.Value; z++)
+            {
+                cimp.ProjectAddResource("ZONE" + z.ToString("00"));
+                for (int m = 1; m <= (int)numMS.Value; m++)
+                {
+                    ++i;
+                    cimp.ProjectAddAlmCls(i, "ZONE" + z.ToString("00"), "MS" + m.ToString("00"));
+                }
+            }
+
+            numZones.Visible = false;
+            numMS.Visible = false;
+            btnClass.Visible = false;
+            label1.Visible = false;
+            label2.Visible = false;
+            cimp.GetMachineSections();
+        }
+
+        private void Form1_DoubleClick(object sender, EventArgs e)
+        {
+            numZones.Visible = true;
+            btnClass.Visible = true;
+            label1.Visible = true;
+            label2.Visible = true;
+            numMS.Visible = true;
+        }
     }
 }

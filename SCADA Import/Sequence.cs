@@ -35,7 +35,7 @@ namespace JLR.SCADA.DCP
             s = s.Replace("Slot", "S");
             ID = s + "_STN" + seqNum.ToString("00");
 
-            ALARM_CLASS = zone + ":MS" + ms.ToString("00");
+            ALARM_CLASS = zone + "_MS" + ms.ToString("00");
 
         }
     }

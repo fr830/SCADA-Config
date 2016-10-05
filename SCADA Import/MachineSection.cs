@@ -19,11 +19,11 @@ namespace JLR.SCADA.DCP
         public MachineSection(string id, string description)
         {
 
-            string[] spilt = description.Split(':');
+            string[] spilt = id.Split('_');
             Zone = spilt[0];
             MS = spilt[1];
             Description = description;
-            ALARM_CLASS = id;
+            ALARM_CLASS = spilt[1];
             
         }
     }

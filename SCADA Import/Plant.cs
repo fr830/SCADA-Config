@@ -32,8 +32,7 @@ namespace JLR.SCADA.DCP
         {
             Plc p = Plcs.ElementAt(TransactionID - 1).Value;
             string[] v = new string[61];
-            string zone = "ZONE01";
-            if (TransactionID % 2 == 0) zone = "ZONE02";
+            string zone = "ZONE" + TransactionID.ToString("00");
 
             for (int i = 1; i <= 60; i++)
             {
@@ -213,8 +212,7 @@ namespace JLR.SCADA.DCP
                 {
                     oGroup.SyncRead((short)OPCAutomation.OPCDataSource.OPCDevice, 60, ref SvrHndl, out Values, out SvrErr, out qual, out TS);
 
-                    string zone = "ZONE01";
-                    if (plc.ID % 2 == 0) zone = "ZONE02";
+                    string zone = "ZONE" + plc.ID.ToString("00");
 
                     for (int j = 1; j <= 30; j++)
                     {
