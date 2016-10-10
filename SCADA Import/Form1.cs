@@ -16,7 +16,8 @@ namespace JLR.SCADA.DCP
     {
         bool Dynamic = false;
         bool SyncData = false;
-        string sProject = "D:\\Projects\\SCADA_TEST\\SCADA_TEST.gef";
+        string sPrjName = "SCADA_TEST";
+        string sPrjPath = "D:\\Projects\\";
         string sClass = "SCADA_SEQ";
         Plant plant;
         CimpSeqs cimp;
@@ -29,7 +30,7 @@ namespace JLR.SCADA.DCP
             plant.NewSeq += NewPlantSeq;
             plant.NewPlc += NewPlantPLC;
 
-            cimp = new CimpSeqs(sProject, sClass, Dynamic);
+            cimp = new CimpSeqs(sPrjName, sPrjPath, sClass, Dynamic);
             cimp.NewSeq += NewCimpSeq;
             cimp.NewPlc += NewCimpPLC;
             cimp.NewMS += NewCimpMS;
@@ -82,13 +83,11 @@ namespace JLR.SCADA.DCP
             if (t1.Length == 1)
             {
                 t2 = t1[0];
-                //else
-                //  t2 = tvCimpConfig.Nodes.Add(p.Tag, p.Description);
-
                 t2.Nodes.Add(s.Key, s.Description);
                 t2.ForeColor = Color.Black;
                 tvPlantConfig.Refresh();
                 tvCimpConfig.Refresh();
+
             }
         }
 

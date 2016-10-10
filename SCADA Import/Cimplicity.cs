@@ -24,6 +24,7 @@ namespace JLR.SCADA.DCP
         public Dictionary<string, MachineSection> MachineSections = new Dictionary<string, MachineSection>();
 
         public string Project { get; set; }
+        public string Path { get; set; }
         public string Class { get; set; }
         public bool Dynamic { get; set; }
 
@@ -36,13 +37,14 @@ namespace JLR.SCADA.DCP
         CimTable oTableLG_REASON_CODE;
         CimTable oTableLG_STATUS;
 
-        public CimpSeqs(string project, string cimclass, bool dynamic)
+        public CimpSeqs(string prjName, string prjPath, string cimclass, bool dynamic)
         {
-            Project = project;
+            Project = prjName;
+            Path = prjPath;
             Class = cimclass;
             Dynamic = dynamic;
 
-            oProject.OpenLocalProject(Project);
+            oProject.OpenLocalProject($"{prjPath}{prjName}\\{prjName}.gef");
             oProject.ProjectUserName = "ADMINISTRATOR";
             oProject.ProjectPassword = "";
             oProject.dynamicMode = Dynamic;
@@ -68,6 +70,7 @@ namespace JLR.SCADA.DCP
                 {
                     string plc = o.Attributes["PLC"].Value;
                     int ms = int.Parse(o.Attributes["MS"].Value.Substring(2, 2));
+                    string MS = o.Attributes["AL"].Value;
                     int seq = int.Parse(o.Attributes["SEQ"].Value);
                     string desc = o.Attributes["$DESCRIPTION"].Value;
                     string device = o.Attributes["$DEVICE_ID"].Value;
@@ -88,7 +91,7 @@ namespace JLR.SCADA.DCP
             foreach (CimObjectInstance c in oProject.Objects)
                 if (c.ClassID.Equals("SCADA_MS"))
                 {
-                    MachineSection ms = new MachineSection(c.ID, c.Description);
+                    MachineSection ms = new MachineSection(c.ID, c.Description, c.Attributes["MS"].Value);
                     MachineSections.Add(c.ID, ms);
                     NewMS?.Invoke(ms);
                 }
@@ -152,8 +155,9 @@ namespace JLR.SCADA.DCP
             oObj.ID = s.ID;
             oObj.Attributes.Set("$DESCRIPTION", s.Station);
             oObj.Attributes.Set("$DEVICE_ID", s.Plc.DEVICE_ID);
-            oObj.Attributes.Set("$RESOURCE_ID", "ZONE01");
-            oObj.Attributes.Set("MS", this.MachineSections[s.ALARM_CLASS].MS);
+            oObj.Attributes.Set("$RESOURCE_ID", $"ZONE0{s.Plc.ID.ToString()}");
+            oObj.Attributes.Set("AL", this.MachineSections[s.msObj].ALARM_CLASS);
+            oObj.Attributes.Set("MS", this.MachineSections[s.msObj].MS);
             oObj.Attributes.Set("PLC", s.Plc.Tag);
             oObj.Attributes.Set("SEQ", s.SeqNum.ToString());
 
@@ -176,7 +180,7 @@ namespace JLR.SCADA.DCP
             }
 
             Plc p = AddPLC(s.Plc.Tag, s.Plc.DEVICE_ID);
-            Sequence s1 = AddSequence(this.Plcs[s.Plc.Tag], s.SeqNum, "ZONE01", s.MS, s.Station);
+            Sequence s1 = AddSequence(this.Plcs[s.Plc.Tag], s.SeqNum, $"ZONE0{s.Plc.ID.ToString()}", s.MS, s.Station);
             NewSeq?.Invoke(s1.Plc, s);
 
 
@@ -240,7 +244,7 @@ namespace JLR.SCADA.DCP
             oObj.ID = zone + "_" + ms;
             oObj.Attributes.Set("$RESOURCE_ID", zone);
             oObj.Attributes.Set("$DESCRIPTION", zone + " " + ms);
-            oObj.Attributes.Set("MS", ms);
+            oObj.Attributes.Set("MS", $"MS{i.ToString("00")}");
 
             oObj.Routing.AddAll();
 
@@ -254,6 +258,15 @@ namespace JLR.SCADA.DCP
             r = oProject.Resources.New(zone);
             r.Users.AddAll();
             oProject.Resources.Save(r, 0);
+        }
+
+        public bool ProjectRunning()
+        {
+            return ProjectRunning(this.Project);
+        }
+        public bool ProjectRunning(string prj)
+        {
+            return false;
         }
 
     }

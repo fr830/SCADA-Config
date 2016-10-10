@@ -16,14 +16,14 @@ namespace JLR.SCADA.DCP
         public string Description { get; set; }
         public string ALARM_CLASS { get; set; }
 
-        public MachineSection(string id, string description)
+        public MachineSection(string id, string description, string almcls)
         {
 
             string[] spilt = id.Split('_');
             Zone = spilt[0];
             MS = spilt[1];
             Description = description;
-            ALARM_CLASS = spilt[1];
+            ALARM_CLASS = almcls;// spilt[1];
             
         }
     }
