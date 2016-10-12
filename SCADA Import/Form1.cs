@@ -9,6 +9,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Diagnostics;
+using Proficy.CIMPLICITY.CimServer;
 
 namespace JLR.SCADA.DCP
 {
@@ -65,9 +66,9 @@ namespace JLR.SCADA.DCP
                 tvMS.Nodes.Add(ms.Zone, ms.Zone);
 
             tvMS.Nodes[ms.Zone].Nodes.Add(ms.ALARM_CLASS, ms.MS);
-            //tvMS.Nodes.Add(ms.MS, ms.Description);
             tvMS.Refresh();
         }
+
         public void NewCimpPLC(Plc p)
         {
 
@@ -87,8 +88,14 @@ namespace JLR.SCADA.DCP
                 t2.ForeColor = Color.Black;
                 tvPlantConfig.Refresh();
                 tvCimpConfig.Refresh();
-
             }
+                t1 = tvMS.Nodes.Find(cimp.MachineSections[s.msObj].ALARM_CLASS, true);
+
+            if (t1.Length == 1)
+            {
+                t1[0].Nodes.Add(s.ID, s.Description);
+            }
+
         }
 
         private void chkDynamic_CheckedChanged(object sender, EventArgs e)
@@ -189,7 +196,7 @@ namespace JLR.SCADA.DCP
                 {
                     foreach (KeyValuePair<string, Sequence> s1 in p1.Value.Sequnces)
                         if (cimp.Plcs[p1.Key].Sequnces.ContainsKey(s1.Key))
-                            if(cimp.Plcs[p1.Key].Sequnces[s1.Key].MS == plant.Plcs[p1.Key].Sequnces[s1.Key].MS)
+                            if(cimp.Plcs[p1.Key].Sequnces[s1.Key].MSNum == plant.Plcs[p1.Key].Sequnces[s1.Key].MSNum)
                                 {
                                     tvCimpConfig.Nodes.Find(s1.Key, true)[0].BackColor = Color.Transparent;
                                     tvCimpConfig.Nodes.Find(s1.Key, true)[0].ForeColor = Color.Black;
@@ -219,7 +226,7 @@ namespace JLR.SCADA.DCP
                 {
                     foreach (KeyValuePair<string, Sequence> s1 in p1.Value.Sequnces)
                         if (plant.Plcs[p1.Key].Sequnces.ContainsKey(s1.Key))
-                            if (plant.Plcs[p1.Key].Sequnces[s1.Key].MS == cimp.Plcs[p1.Key].Sequnces[s1.Key].MS)
+                            if (plant.Plcs[p1.Key].Sequnces[s1.Key].MSNum == cimp.Plcs[p1.Key].Sequnces[s1.Key].MSNum)
                             {
                                 tvPlantConfig.Nodes.Find(s1.Key, true)[0].BackColor = Color.Transparent;
                                 tvPlantConfig.Nodes.Find(s1.Key, true)[0].ForeColor = Color.Black;
@@ -447,5 +454,6 @@ namespace JLR.SCADA.DCP
             label2.Visible = true;
             numMS.Visible = true;
         }
+
     }
 }

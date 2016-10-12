@@ -9,31 +9,41 @@ namespace JLR.SCADA.DCP
     public class Sequence
     {
         public string Key { get; set; }
+
         public string ID { get; set; }
+
         public string Description { get; set; }
+
         public string Station { get; set; }
-        public int MS { get; set; }
+
+        public int MSNum { get; set; }
+
         public string Zone { get; set; }
+
         public string msObj { get; set; }
+
         public int SeqNum { get; set; }
+
         public Plc Plc { get; set; }
-        public Sequence(Plc p, int seqNum, string zone, int ms, string station)
+
+        public Sequence(Plc p, int seqNum, string zone, int msNum, string station)
         {
             Key = p.ObjRoot + "." + seqNum.ToString("00");
             SeqNum = seqNum;
-            MS = ms;
+            MSNum = msNum;
             Zone = zone;
             Station = station;
-            Description = $"Seq:[{seqNum.ToString("00")}] MS:{ms.ToString("00")} - {station}";
+            Description = $"Seq:[{seqNum.ToString("00")}] MS:{msNum.ToString("00")} - {station}";
             Plc = p;
 
             string s = p.ObjRoot;
             s = s.Replace("_", "");
             s = s.Replace(".", "");
             s = s.Replace("Slot", "S");
+
             ID = s + "_STN" + seqNum.ToString("00");
             
-            msObj = zone + "_MS" + ms.ToString("00");
+            msObj = zone + "_MS" + msNum.ToString("00");
 
         }
 

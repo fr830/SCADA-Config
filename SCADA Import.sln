@@ -5,16 +5,30 @@ VisualStudioVersion = 14.0.25420.1
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SCADA Import", "SCADA Import\SCADA Import.csproj", "{47122F2E-CEBA-4018-9D08-E8DB9B0D9302}"
 EndProject
+Project("{F14B399A-7131-4C87-9E4B-1186C45EF12D}") = "SCADA Reports", "SCADA Reports\SCADA Reports.rptproj", "{91AA8C23-44A9-4BB2-B9E4-4378F780E713}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
+		DebugLocal|Any CPU = DebugLocal|Any CPU
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{47122F2E-CEBA-4018-9D08-E8DB9B0D9302}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{47122F2E-CEBA-4018-9D08-E8DB9B0D9302}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{47122F2E-CEBA-4018-9D08-E8DB9B0D9302}.DebugLocal|Any CPU.ActiveCfg = Debug|Any CPU
+		{47122F2E-CEBA-4018-9D08-E8DB9B0D9302}.DebugLocal|Any CPU.Build.0 = Debug|Any CPU
 		{47122F2E-CEBA-4018-9D08-E8DB9B0D9302}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{47122F2E-CEBA-4018-9D08-E8DB9B0D9302}.Release|Any CPU.Build.0 = Release|Any CPU
+		{91AA8C23-44A9-4BB2-B9E4-4378F780E713}.Debug|Any CPU.ActiveCfg = Debug
+		{91AA8C23-44A9-4BB2-B9E4-4378F780E713}.Debug|Any CPU.Build.0 = Debug
+		{91AA8C23-44A9-4BB2-B9E4-4378F780E713}.Debug|Any CPU.Deploy.0 = Debug
+		{91AA8C23-44A9-4BB2-B9E4-4378F780E713}.DebugLocal|Any CPU.ActiveCfg = DebugLocal
+		{91AA8C23-44A9-4BB2-B9E4-4378F780E713}.DebugLocal|Any CPU.Build.0 = DebugLocal
+		{91AA8C23-44A9-4BB2-B9E4-4378F780E713}.DebugLocal|Any CPU.Deploy.0 = DebugLocal
+		{91AA8C23-44A9-4BB2-B9E4-4378F780E713}.Release|Any CPU.ActiveCfg = Release
+		{91AA8C23-44A9-4BB2-B9E4-4378F780E713}.Release|Any CPU.Build.0 = Release
+		{91AA8C23-44A9-4BB2-B9E4-4378F780E713}.Release|Any CPU.Deploy.0 = Release
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

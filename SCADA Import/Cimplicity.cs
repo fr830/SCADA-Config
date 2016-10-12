@@ -97,7 +97,6 @@ namespace JLR.SCADA.DCP
                 }
         }
 
-
         public Plc AddPLC(string description, string device)
         {
             if (this.Plcs.ContainsKey(description))
@@ -180,7 +179,7 @@ namespace JLR.SCADA.DCP
             }
 
             Plc p = AddPLC(s.Plc.Tag, s.Plc.DEVICE_ID);
-            Sequence s1 = AddSequence(this.Plcs[s.Plc.Tag], s.SeqNum, $"ZONE0{s.Plc.ID.ToString()}", s.MS, s.Station);
+            Sequence s1 = AddSequence(this.Plcs[s.Plc.Tag], s.SeqNum, $"ZONE0{s.Plc.ID.ToString()}", s.MSNum, s.Station);
             NewSeq?.Invoke(s1.Plc, s);
 
 
@@ -264,6 +263,7 @@ namespace JLR.SCADA.DCP
         {
             return ProjectRunning(this.Project);
         }
+
         public bool ProjectRunning(string prj)
         {
             return false;
