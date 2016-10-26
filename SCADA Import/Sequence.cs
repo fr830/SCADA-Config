@@ -26,14 +26,14 @@ namespace JLR.SCADA.DCP
 
         public Plc Plc { get; set; }
 
-        public Sequence(Plc p, int seqNum, string zone, int msNum, string station)
+        public Sequence(Plc p, int seqNum, string zone, double ms, string station)
         {
             Key = p.ObjRoot + "." + seqNum.ToString("00");
             SeqNum = seqNum;
-            MSNum = msNum;
+            MSNum = (int)Math.Log(ms, 2);
             Zone = zone;
             Station = station;
-            Description = $"Seq:[{seqNum.ToString("00")}] MS:{msNum.ToString("00")} - {station}";
+            Description = $"Seq:[{seqNum.ToString("00")}] MS:{MSNum.ToString("00")} - {station}";
             Plc = p;
 
             string s = p.ObjRoot;
@@ -42,8 +42,29 @@ namespace JLR.SCADA.DCP
             s = s.Replace("Slot", "S");
 
             ID = s + "_STN" + seqNum.ToString("00");
-            
-            msObj = zone + "_MS" + msNum.ToString("00");
+
+            msObj = zone + "_MS" + MSNum.ToString("00");
+
+        }
+
+        public Sequence(Plc p, int seqNum, string zone, int ms, string station)
+        {
+            Key = p.ObjRoot + "." + seqNum.ToString("00");
+            SeqNum = seqNum;
+            MSNum = ms;
+            Zone = zone;
+            Station = station;
+            Description = $"Seq:[{seqNum.ToString("00")}] MS:{MSNum.ToString("00")} - {station}";
+            Plc = p;
+
+            string s = p.ObjRoot;
+            s = s.Replace("_", "");
+            s = s.Replace(".", "");
+            s = s.Replace("Slot", "S");
+
+            ID = s + "_STN" + seqNum.ToString("00");
+
+            msObj = zone + "_MS" + MSNum.ToString("00");
 
         }
 

@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Diagnostics;
 using Proficy.CIMPLICITY.CimServer;
+using System.Configuration;
 
 namespace JLR.SCADA.DCP
 {
@@ -60,12 +61,12 @@ namespace JLR.SCADA.DCP
             tvPlantConfig.Refresh();
         }
         
-        public void NewCimpMS(MachineSection ms)
+        public void NewCimpMS(SafetyArea ms)
         {
             if (tvMS.Nodes.Find(ms.Zone, true).Count() == 0)
                 tvMS.Nodes.Add(ms.Zone, ms.Zone);
 
-            tvMS.Nodes[ms.Zone].Nodes.Add(ms.ALARM_CLASS, ms.MS);
+            tvMS.Nodes[ms.Zone].Nodes.Add(ms.ALARM_CLASS, ms.SA);
             tvMS.Refresh();
         }
 
@@ -89,7 +90,7 @@ namespace JLR.SCADA.DCP
                 tvPlantConfig.Refresh();
                 tvCimpConfig.Refresh();
             }
-                t1 = tvMS.Nodes.Find(cimp.MachineSections[s.msObj].ALARM_CLASS, true);
+                t1 = tvMS.Nodes.Find(cimp.SafetyAreas[s.msObj].ALARM_CLASS, true);
 
             if (t1.Length == 1)
             {
@@ -132,7 +133,7 @@ namespace JLR.SCADA.DCP
         {
             tvCimpConfig.Nodes.Clear();
             tvMS.Nodes.Clear();
-            cimp.GetMachineSections();
+            cimp.GetSafetyAreas();
             cimp.GetSeqences();
         }
 
@@ -196,16 +197,16 @@ namespace JLR.SCADA.DCP
                 {
                     foreach (KeyValuePair<string, Sequence> s1 in p1.Value.Sequnces)
                         if (cimp.Plcs[p1.Key].Sequnces.ContainsKey(s1.Key))
-                            if(cimp.Plcs[p1.Key].Sequnces[s1.Key].MSNum == plant.Plcs[p1.Key].Sequnces[s1.Key].MSNum)
-                                {
-                                    tvCimpConfig.Nodes.Find(s1.Key, true)[0].BackColor = Color.Transparent;
-                                    tvCimpConfig.Nodes.Find(s1.Key, true)[0].ForeColor = Color.Black;
-                                }
-                                else
-                                {
-                                    tvPlantConfig.Nodes.Find(p1.Key, true)[0].BackColor = Color.DarkRed;
-                                    tvPlantConfig.Nodes.Find(p1.Key, true)[0].ForeColor = Color.White;
-                                }
+                            if (cimp.Plcs[p1.Key].Sequnces[s1.Key].MSNum == plant.Plcs[p1.Key].Sequnces[s1.Key].MSNum)
+                            {
+                                tvCimpConfig.Nodes.Find(s1.Key, true)[0].BackColor = Color.Transparent;
+                                tvCimpConfig.Nodes.Find(s1.Key, true)[0].ForeColor = Color.Black;
+                            }
+                            else
+                            {
+                                tvPlantConfig.Nodes.Find(p1.Key, true)[0].BackColor = Color.DarkRed;
+                                tvPlantConfig.Nodes.Find(p1.Key, true)[0].ForeColor = Color.White;
+                            }
                 }
                 else
                 {
@@ -443,7 +444,7 @@ namespace JLR.SCADA.DCP
             btnClass.Visible = false;
             label1.Visible = false;
             label2.Visible = false;
-            cimp.GetMachineSections();
+            cimp.GetSafetyAreas();
         }
 
         private void Form1_DoubleClick(object sender, EventArgs e)
@@ -455,5 +456,12 @@ namespace JLR.SCADA.DCP
             numMS.Visible = true;
         }
 
+        private void button1_Click(object sender, EventArgs e)
+        {
+            string value1 = ConfigurationManager.AppSettings["SettingKey1"];
+            string value2 = ConfigurationManager.AppSettings["SettingKey2"];
+
+
+        }
     }
 }

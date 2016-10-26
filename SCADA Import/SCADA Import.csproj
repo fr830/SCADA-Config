@@ -78,6 +78,7 @@
       <EmbedInteropTypes>True</EmbedInteropTypes>
     </Reference>
     <Reference Include="System" />
+    <Reference Include="System.Configuration" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
@@ -97,7 +98,8 @@
     <Compile Include="Form1.Designer.cs">
       <DependentUpon>Form1.cs</DependentUpon>
     </Compile>
-    <Compile Include="MachineSection.cs" />
+    <Compile Include="Robot.cs" />
+    <Compile Include="SafetyArea.cs" />
     <Compile Include="Plant.cs" />
     <Compile Include="PLC.cs" />
     <Compile Include="Program.cs" />

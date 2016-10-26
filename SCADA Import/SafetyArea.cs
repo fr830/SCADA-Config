@@ -9,19 +9,19 @@ using Proficy.CIMPLICITY.CimServer;
 
 namespace JLR.SCADA.DCP
 {
-    public class MachineSection
+    public class SafetyArea
     {
         public string Zone { get; set; }
-        public string MS { get; set; }
+        public string SA { get; set; }
         public string Description { get; set; }
         public string ALARM_CLASS { get; set; }
 
-        public MachineSection(string id, string description, string almcls)
+        public SafetyArea(string id, string description, string almcls)
         {
 
             string[] spilt = id.Split('_');
             Zone = spilt[0];
-            MS = spilt[1];
+            SA = spilt[1];
             Description = description;
             ALARM_CLASS = almcls;// spilt[1];
             

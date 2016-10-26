@@ -17,11 +17,11 @@ namespace JLR.SCADA.DCP
         public event SeqHandler NewSeq;
         public delegate void PlcHandler(Plc p);
         public event PlcHandler NewPlc;
-        public delegate void MSHandler(MachineSection m);
+        public delegate void MSHandler(SafetyArea m);
         public event MSHandler NewMS;
 
         public Dictionary<string, Plc> Plcs = new Dictionary<string, Plc>();
-        public Dictionary<string, MachineSection> MachineSections = new Dictionary<string, MachineSection>();
+        public Dictionary<string, SafetyArea> SafetyAreas = new Dictionary<string, SafetyArea>();
 
         public string Project { get; set; }
         public string Path { get; set; }
@@ -85,14 +85,14 @@ namespace JLR.SCADA.DCP
             }
         }
 
-        public void GetMachineSections()
+        public void GetSafetyAreas()
         {
-            MachineSections.Clear();
+            SafetyAreas.Clear();
             foreach (CimObjectInstance c in oProject.Objects)
                 if (c.ClassID.Equals("SCADA_MS"))
                 {
-                    MachineSection ms = new MachineSection(c.ID, c.Description, c.Attributes["MS"].Value);
-                    MachineSections.Add(c.ID, ms);
+                    SafetyArea ms = new SafetyArea(c.ID, c.Description, c.Attributes["MS"].Value);
+                    SafetyAreas.Add(c.ID, ms);
                     NewMS?.Invoke(ms);
                 }
         }
@@ -154,9 +154,9 @@ namespace JLR.SCADA.DCP
             oObj.ID = s.ID;
             oObj.Attributes.Set("$DESCRIPTION", s.Station);
             oObj.Attributes.Set("$DEVICE_ID", s.Plc.DEVICE_ID);
-            oObj.Attributes.Set("$RESOURCE_ID", $"ZONE0{s.Plc.ID.ToString()}");
-            oObj.Attributes.Set("AL", this.MachineSections[s.msObj].ALARM_CLASS);
-            oObj.Attributes.Set("MS", this.MachineSections[s.msObj].MS);
+            oObj.Attributes.Set("$RESOURCE_ID", $"ZONE{s.Plc.ID.ToString("00")}");
+            oObj.Attributes.Set("AL", this.SafetyAreas[s.msObj].ALARM_CLASS);
+            oObj.Attributes.Set("MS", this.SafetyAreas[s.msObj].SA);
             oObj.Attributes.Set("PLC", s.Plc.Tag);
             oObj.Attributes.Set("SEQ", s.SeqNum.ToString());
 

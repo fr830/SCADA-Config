@@ -28,6 +28,8 @@ namespace JLR.SCADA.DCP
         private string sGroup = "SCADA";
         private OPCType type;
 
+        public Plant() { }
+        
         private void OCPCallBack(int TransactionID, int NumItems, ref Array ClientHandles, ref Array Values, ref Array Qualities, ref Array TimeStamps, ref Array Errors)
         {
             Plc p = Plcs.ElementAt(TransactionID - 1).Value;
@@ -36,6 +38,8 @@ namespace JLR.SCADA.DCP
 
             for (int i = 1; i <= 60; i++)
             {
+                string kjr1 = ClientHandles.GetValue(i).ToString();
+                string kjr2 = Values.GetValue(i).ToString();
                 v[int.Parse(ClientHandles.GetValue(i).ToString())] = Values.GetValue(i).ToString();
 
             }
@@ -52,8 +56,6 @@ namespace JLR.SCADA.DCP
                 }
             }
         }
-
-        public Plant() { }
 
         public void GetOPCTags(OPCType opc, bool SyncData)
         {
@@ -188,17 +190,17 @@ namespace JLR.SCADA.DCP
                     {
                         case OPCType.Kepware:
 
-                            tag = $"{plc.Tag}.ZZMISSEQ[{(i).ToString()}].SEQ";
+                            tag = $"{plc.Tag}.ZZSEQ[{(i).ToString()}].SA";
                             ItemIDs.SetValue(tag, i);
-                            tag = $"{plc.Tag}.ZZMISSEQ[{(i).ToString()}].DESC.DATA/8";
+                            tag = $"{plc.Tag}.ZZSEQ[{(i).ToString()}].DESC.DATA/8";
                             ItemIDs.SetValue(tag, i + 30);
                             break;
 
                         case OPCType.Matrikon:
-                            tag = $"{plc.Tag}:PLC:SCADA_CONFIG:ZZMISSEQ[{(i).ToString()}].SEQ.VALUE";
+                            tag = $"{plc.Tag}:PLC:SCADA_CONFIG:ZZSEQ[{(i).ToString()}].SEQ.VALUE";
                             ItemIDs.SetValue(tag, i);
                             //"A3_01_R01_S01: PLC: SCADA_CONFIG: ZZMISSEQ[1].DESC.VALUE"
-                            tag = $"{plc.Tag}:PLC:SCADA_CONFIG:ZZMISSEQ[{(i).ToString()}].DESC.VALUE";
+                            tag = $"{plc.Tag}:PLC:SCADA_CONFIG:ZZSEQ[{(i).ToString()}].DESC.VALUE";
                             ItemIDs.SetValue(tag, i + 30);
                             break;
                     }
@@ -216,7 +218,7 @@ namespace JLR.SCADA.DCP
 
                     for (int j = 1; j <= 30; j++)
                     {
-                        int ms = int.Parse(Values.GetValue(j).ToString());
+                        double ms = double.Parse(Values.GetValue(j).ToString());
                         string desc = Values.GetValue(j + 30).ToString();
                         if (ms > 0)
                         {

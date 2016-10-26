@@ -10,8 +10,16 @@
   <DataSets />
   <Reports>
     <ProjectItem>
+      <Name>JustATest.rdl</Name>
+      <FullPath>JustATest.rdl</FullPath>
+    </ProjectItem>
+    <ProjectItem>
       <Name>StatusTest.rdl</Name>
       <FullPath>StatusTest.rdl</FullPath>
+    </ProjectItem>
+    <ProjectItem>
+      <Name>CountTest.rdl</Name>
+      <FullPath>CountTest.rdl</FullPath>
     </ProjectItem>
   </Reports>
   <Configurations>
