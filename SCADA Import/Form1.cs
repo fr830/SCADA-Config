@@ -20,7 +20,7 @@ namespace JLR.SCADA.DCP
         bool SyncData = false;
         string sPrjName = "SCADA_TEST";
         string sPrjPath = "D:\\Projects\\";
-        string sClass = "SCADA_SEQ";
+        string sClass = "SCADA_DCP_SEQ";
         Plant plant;
         CimpSeqs cimp;
 

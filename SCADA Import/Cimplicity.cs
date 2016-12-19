@@ -49,13 +49,13 @@ namespace JLR.SCADA.DCP
             oProject.ProjectPassword = "";
             oProject.dynamicMode = Dynamic;
 
-            oTableLG_BAD_PART = oProject.Database.GetTable("LG_BAD_PART");
-            oTableLG_CYCLE_TIME = oProject.Database.GetTable("LG_CYCLE_TIME");
-            oTableLG_FAULT_CODE = oProject.Database.GetTable("LG_FAULT_CODE");
-            oTableLG_GOOD_PART = oProject.Database.GetTable("LG_GOOD_PART");
-            oTableLG_PART_TYPE = oProject.Database.GetTable("LG_PART_TYPE");
-            oTableLG_REASON_CODE = oProject.Database.GetTable("LG_REASON_CODE");
-            oTableLG_STATUS = oProject.Database.GetTable("LG_STATUS");
+            oTableLG_BAD_PART = oProject.Database.GetTable("LG_SEQ_BAD_PART");
+            oTableLG_CYCLE_TIME = oProject.Database.GetTable("LG_SEQ_CYCLE_TME");
+            oTableLG_FAULT_CODE = oProject.Database.GetTable("LG_SEQ_FLT_CODE");
+            oTableLG_GOOD_PART = oProject.Database.GetTable("LG_SEQ_GOOD_PART");
+            oTableLG_PART_TYPE = oProject.Database.GetTable("LG_SEQ_PART_TYPE");
+            oTableLG_REASON_CODE = oProject.Database.GetTable("LG_SEQ_RSN_CODE");
+            oTableLG_STATUS = oProject.Database.GetTable("LG_ZON_EX_STATE");
 
 
         }
@@ -69,8 +69,8 @@ namespace JLR.SCADA.DCP
                 if (o.ClassID == Class)
                 {
                     string plc = o.Attributes["PLC"].Value;
-                    int ms = int.Parse(o.Attributes["MS"].Value.Substring(2, 2));
-                    string MS = o.Attributes["AL"].Value;
+                    int ms = int.Parse(o.Attributes["SA"].Value.Substring(2, 2));
+                    //string MS = o.Attributes["AL"].Value;
                     int seq = int.Parse(o.Attributes["SEQ"].Value);
                     string desc = o.Attributes["$DESCRIPTION"].Value;
                     string device = o.Attributes["$DEVICE_ID"].Value;
@@ -89,9 +89,9 @@ namespace JLR.SCADA.DCP
         {
             SafetyAreas.Clear();
             foreach (CimObjectInstance c in oProject.Objects)
-                if (c.ClassID.Equals("SCADA_MS"))
+                if (c.ClassID.Equals("SCADA_DCP_SAF"))
                 {
-                    SafetyArea ms = new SafetyArea(c.ID, c.Description, c.Attributes["MS"].Value);
+                    SafetyArea ms = new SafetyArea(c.ID, c.Description, c.ID.Substring(8));
                     SafetyAreas.Add(c.ID, ms);
                     NewMS?.Invoke(ms);
                 }
@@ -155,8 +155,8 @@ namespace JLR.SCADA.DCP
             oObj.Attributes.Set("$DESCRIPTION", s.Station);
             oObj.Attributes.Set("$DEVICE_ID", s.Plc.DEVICE_ID);
             oObj.Attributes.Set("$RESOURCE_ID", $"ZONE{s.Plc.ID.ToString("00")}");
-            oObj.Attributes.Set("AL", this.SafetyAreas[s.msObj].ALARM_CLASS);
-            oObj.Attributes.Set("MS", this.SafetyAreas[s.msObj].SA);
+            //oObj.Attributes.Set("AL", this.SafetyAreas[s.msObj].ALARM_CLASS);
+            oObj.Attributes.Set("SA", this.SafetyAreas[s.msObj].SA);
             oObj.Attributes.Set("PLC", s.Plc.Tag);
             oObj.Attributes.Set("SEQ", s.SeqNum.ToString());
 
@@ -238,12 +238,12 @@ namespace JLR.SCADA.DCP
             c.Save();
             
             CimObjectInstance oObj = new CimObjectInstance();
-            oObj.ClassID = "SCADA_MS";
+            oObj.ClassID = "SCADA_DCP_SAF";
 
             oObj.ID = zone + "_" + ms;
             oObj.Attributes.Set("$RESOURCE_ID", zone);
             oObj.Attributes.Set("$DESCRIPTION", zone + " " + ms);
-            oObj.Attributes.Set("MS", $"MS{i.ToString("00")}");
+            //oObj.Attributes.Set("MS", $"MS{i.ToString("00")}");
 
             oObj.Routing.AddAll();
 
