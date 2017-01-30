@@ -69,7 +69,7 @@ namespace JLR.SCADA.DCP
             switch (type)
             {
                 case OPCType.Kepware:
-                    server = "Kepware.KEPServerEX.V5";
+                    server = "Kepware.KEPServerEX.V6";
                     filter1 = "A3*";
                     filter2 = "R*";
                     sep = ".";
